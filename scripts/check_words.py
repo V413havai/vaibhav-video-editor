@@ -54,6 +54,8 @@ def main():
             if s + 0.05 < w['start'] < e - 0.05:
                 flags.append((w['start'], f'"{w["word"]}" starts at {w["start"]:.2f} inside a silence {s:.2f}-{e:.2f}'))
     for s, e in gs:
+        if not any(w['start'] >= s for w in words):
+            continue                                    # silence after the last word (an ending or a hold) is fine
         if e - s >= 0.4 and not any(abs(w['start'] - e) <= 0.35 for w in words):
             near = min(words, key=lambda w: abs(w['start'] - e), default=None)
             hint = f' (nearest word "{near["word"]}" at {near["start"]:.2f})' if near else ''
