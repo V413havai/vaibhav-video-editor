@@ -29,6 +29,14 @@ Every component this skill can drive: what it's best at, where it lives, how the
 - **Where:** `~/.claude/skills/remotion-best-practices/` (rules for each topic in `rules/`). awa ships its own Remotion project in `awa-video-reel/remotion/`.
 - **Missing:** use HyperFrames.
 
+### Voices (voiceover mode)
+- **`scripts/voiceover.py`:** one command for four providers, always returning the voice file and word timings (`[{start, end, word}]`).
+- **ElevenLabs:** `ELEVENLABS_API_KEY`; calls `/v1/text-to-speech/{voice}/with-timestamps` for exact timings. Default model `eleven_multilingual_v2` (Hindi and Hinglish). Free plan: credit line, non-commercial.
+- **Google Gemini TTS:** `GEMINI_API_KEY` (free from Google AI Studio); through the HyperFrames audio engine (`media-use/audio/scripts/audio.mjs`, provider `gemini`), timings by transcription.
+- **HeyGen:** free with `npx hyperframes auth login`; `media-use/audio/scripts/heygen-tts.mjs`, timings included.
+- **Kokoro-82M:** free and offline through `npx hyperframes tts`; needs `pip install kokoro-onnx soundfile` and a ~340 MB model once (ask first). Non-English voices also need `espeak-ng`.
+- **Missing key:** say which key and where it goes; never switch to another voice silently.
+
 ## Effects and styles
 
 ### effects (45 face-tracked effects)

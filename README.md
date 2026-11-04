@@ -20,6 +20,7 @@ Made by Vaibhav ([@vaibhavv.ai](https://instagram.com/vaibhavv.ai)).
 | 7. Sound | Sound effects on every visual beat, music ducked under your voice, mixed to -14 LUFS |
 | 8. Quality check | Checks stills at every beat for faces, safe zones, spelling and timing, plus loudness |
 | 9. Deliver | Final MP4, a no-music copy for trending sounds, credits, and an optional post caption |
+| Voiceover mode | No footage: script → AI voice → fully animated video timed to every word |
 
 ## What you need
 
@@ -84,6 +85,17 @@ Drag a video into Claude Code and type:
 
 It shows you a plan first and only renders after you say go. Then tell it changes in plain words: *"captions bigger"*, *"zoom when I say insane"*, *"the cut at 0:14 is too sudden"*.
 
+**Animated videos with an AI voice.** No footage? Say *"make an animated video about my 5 favourite AI tools with a voiceover"*. It writes the script (you approve it), makes the voice, and animates every word in HyperFrames. Voices:
+
+| Voice | Cost | Setup |
+|---|---|---|
+| ElevenLabs | paid (free plan: credit line, non-commercial) | add `export ELEVENLABS_API_KEY=your-key` to `~/.zshrc` |
+| Google Gemini TTS | free key, free-tier limits | free key at aistudio.google.com/apikey, then `export GEMINI_API_KEY=your-key` |
+| HeyGen | free with sign-in | `npx hyperframes auth login` |
+| Kokoro | free, offline | one-time `pip install kokoro-onnx soundfile` (it asks first) |
+
+Keys stay in your own environment: never paste them into the chat.
+
 **Style presets.** Say *"edit this in Nick style"* for the look of Nick Saraev's AI-tool reels: glowing browser cards over a soft background, a numbered header, big stat callouts, 1 to 3 word captions with a blue keyword, pause-free pacing and a comment-keyword CTA. Presets live in `references/styles/`, and adding one is a single Markdown file.
 
 **Your own style.** If you've saved a style with `/video-editor:start` or `/video-editor:style` (it lives at `~/.claude/skills/my-video-style/`), Vaibhav Video Editor follows it on every edit. Say *"add that to my style"* any time. Without one, it uses a clean, professional house style.
@@ -104,6 +116,7 @@ vaibhav-video-editor/
 │   └── styles/nick-saraev.md     style preset: Nick Saraev's reel look (plus a classic variant)
 └── scripts/
     ├── preflight.sh              finds your tools and skills
+    ├── voiceover.py              AI voice from a script (ElevenLabs, Gemini, HeyGen, Kokoro) + word timings
     ├── check_words.py            catches transcript timing drift against the real speech gaps
     ├── apply_keep.py             makes the clean cut (click-free joins, plus a time map)
     └── sound_mix.py              sound effects + ducked music, two-pass -14 LUFS, plus a no-music copy

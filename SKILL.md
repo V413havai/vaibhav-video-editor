@@ -1,6 +1,6 @@
 ---
 name: vaibhav-video-editor
-description: Full start-to-finish video editing that runs every installed video skill as one pipeline. Cuts silences and retakes, plans the edit from the transcript, then adds captions, motion graphics, face-tracked effects, transitions, camera moves, b-roll, sound effects and music, checks its own work and exports the final MP4. It routes each beat to the right tool (awa-video-reel, the 45-effect engine, Brand Nat style codes, HyperFrames, Remotion, the Video Editor plugin, MultiCam shot) and follows the user's saved style (my-video-style) when there is one. Use when someone types /vaibhav-video-editor, says "edit this video start to finish", "do the full edit", "edit it with everything", "make this a finished reel", asks for an edit that combines cuts, motion graphics, effects, transitions and sound, or asks for a named style preset such as "Nick style" or "edit like Nick Saraev". For a single effect only, use /effects instead.
+description: Full start-to-finish video editing that runs every installed video skill as one pipeline. Cuts silences and retakes, plans the edit from the transcript, then adds captions, motion graphics, face-tracked effects, transitions, camera moves, b-roll, sound effects and music, checks its own work and exports the final MP4. Routes each beat to the right tool (awa-video-reel, the 45-effect engine, Brand Nat codes, HyperFrames, Remotion, the Video Editor plugin, MultiCam shot) and follows the saved style (my-video-style). Also makes fully animated videos from a script with an AI voiceover (ElevenLabs, Google Gemini, HeyGen or free Kokoro). Use when someone types /vaibhav-video-editor, says "edit this video start to finish", "do the full edit", "make this a finished reel", "edit it in Nick style", "make an animated video with a voiceover", or asks for an edit combining cuts, motion graphics, effects, transitions and sound. For a single effect only, use /effects instead.
 ---
 
 # Vaibhav Video Editor
@@ -26,7 +26,7 @@ This skill does not replace the other video skills. It runs them in the right or
 | 8 | Quality check | `references/quality-check.md` | fixes, then a final render |
 | 9 | Deliver | | final MP4, no-music copy, credits, caption |
 
-Never skip stage 5's approval, and never skip stage 8.
+Never skip stage 5's approval, and never skip stage 8. No camera footage? Use **Voiceover mode** (near the end): script, AI voice, then a fully animated video.
 
 ## Stage 0: Preflight
 
@@ -47,7 +47,7 @@ Run `bash scripts/preflight.sh`. It prints one line per tool and component (`OK`
 - `nick-saraev.md`: Nick Saraev's fast AI-tool list reels (split card, full face and full-screen stat layouts, glowing browser cards, blue keyword captions, pause-free pace, comment-keyword CTA). Triggers: "Nick style", "Nick Saraev style", "edit like Nick". Has a classic 2025 variant.
 
 Then ask only what you don't already know, in one short message:
-- Which video? (a path, or drag it in; several clips are joined in name order)
+- Which video? (a path, or drag it in; several clips are joined in name order). No footage, or they want an animated video with an AI voice: switch to **Voiceover mode** below.
 - Where is it going and what shape? (default from the style: usually 9:16 for Reels, TikTok and Shorts)
 - In one line, what is it about, and what should the viewer do at the end?
 - Style: their saved style, a style preset (`references/styles/`, for example Nick style), Brand Nat codes (offer to open the guide: `brand-nat-styles/guide/index.html`), a vibe in words, or "you pick".
@@ -154,6 +154,32 @@ Render the final at full quality and export to `exports/` (or where the engine p
 - one line: watch it before posting
 
 Offer in one line each: another shape (for example 16:9 with a blurred fill), shorts from it (`/video-editor:clips`), a MultiCam shot prompt, a post caption with a comment-keyword CTA, or saving new preferences to their style. Never post or upload anything.
+
+## Voiceover mode: motion-graphics videos from a script
+
+For explainers, tool round-ups, ads and faceless reels: no camera footage, an AI voice, and a fully animated HyperFrames video timed to every word. It also adds a voiceover to footage that has none (screen recordings, b-roll).
+
+**1. Script.** Take their script, or write one from their topic in their voice (a style preset's script shape, for example Nick style's "top 5 … right now / the first is … / comment KEYWORD"). Length: about 150 words a minute for a calm read, 200 to 220 for a fast reel. Short sentences, numbers written the way they should be read. Show the script and wait for an OK.
+
+**2. Voice.** Pick the provider with them (one line each), then run `python3 scripts/voiceover.py work/NAME-script.txt work --name NAME --provider <p> --voice <id>`:
+
+| Provider | Cost | Quality | Needs | Word timings |
+|---|---|---|---|---|
+| `elevenlabs` | paid plans; the free plan needs a credit line and isn't for commercial use | most natural, voice cloning, reads Hindi and Hinglish (`eleven_multilingual_v2`) | `ELEVENLABS_API_KEY` | exact, from the API |
+| `gemini` (Google) | free key from Google AI Studio, with free-tier limits | very natural, directed delivery (`style`) | `GEMINI_API_KEY` | by transcription |
+| `heygen` | free with a HyperFrames sign-in | natural | `npx hyperframes auth login` | exact |
+| `kokoro` | free, offline, commercial use OK | good, clearly synthetic in places | one-time `pip install kokoro-onnx soundfile` and a ~340 MB model (ask first) | by transcription |
+
+- API keys live only in the user's environment (`export ELEVENLABS_API_KEY=...` in `~/.zshrc`, added by them). Never ask for a key in the chat, never write one into a file, and never fall back to another voice silently when a key is missing: say what's missing and stop.
+- `--list-voices` shows the voices for `elevenlabs` and `kokoro`. Let them pick by name; offer two or three that fit the video.
+- Listen check: duration close to the plan, names and numbers read right, no clipped words. Regenerate the whole read after any script change (timings come from the read). Run `scripts/check_words.py` on transcribed timings.
+- The output (`NAME-voice.*`, `NAME-voice-words.json`) replaces the transcript from stage 2: every visual is timed to these words.
+
+**3. Storyboard.** As stage 5, one row per sentence or beat, at the same pace rules. With no face on screen the visuals carry everything: kinetic type on key words, real logos and screenshots of every product named, UI recreations labelled as such, charts for numbers, icons, and optional AI b-roll (generated only after they approve the list and its credits). Read `/hyperframes` and its `references/types/explainer.md` (or `vertical.md` for reels) before planning.
+
+**4. Build (engine C).** Put the voice in the composition as an `<audio id="vo">` from 0, drive every entrance from the word times, and build captions from the same words. Lint, snapshot every beat, render. A style preset applies here too (Nick style without the face card: the split card becomes full-height cards).
+
+**5. Sound and delivery.** As stages 7 to 9: `scripts/sound_mix.py` on the render (the voice is the video's audio, so music ducks under it) with a cue per visual beat, -14 LUFS. Deliver the video, the no-music copy, and the voice file on its own. Name the voice provider in the delivery note, and the credit line when the plan needs one (ElevenLabs free plan).
 
 ## Honest limits
 
