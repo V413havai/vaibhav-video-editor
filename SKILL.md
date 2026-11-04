@@ -1,6 +1,6 @@
 ---
 name: vaibhav-video-editor
-description: Full start-to-finish video editing that runs every installed video skill as one pipeline. Cuts silences and retakes, plans the edit from the transcript, then adds captions, motion graphics, face-tracked effects, transitions, camera moves, b-roll, sound effects and music, checks its own work and exports the final MP4. It routes each beat to the right tool (awa-video-reel, the 45-effect engine, Brand Nat style codes, HyperFrames, Remotion, the Video Editor plugin, MultiCam shot) and follows the user's saved style (my-video-style) when there is one. Use when someone types /vaibhav-video-editor, says "edit this video start to finish", "do the full edit", "edit it with everything", "make this a finished reel", or asks for an edit that combines cuts, motion graphics, effects, transitions and sound. For a single effect only, use /effects instead.
+description: Full start-to-finish video editing that runs every installed video skill as one pipeline. Cuts silences and retakes, plans the edit from the transcript, then adds captions, motion graphics, face-tracked effects, transitions, camera moves, b-roll, sound effects and music, checks its own work and exports the final MP4. It routes each beat to the right tool (awa-video-reel, the 45-effect engine, Brand Nat style codes, HyperFrames, Remotion, the Video Editor plugin, MultiCam shot) and follows the user's saved style (my-video-style) when there is one. Use when someone types /vaibhav-video-editor, says "edit this video start to finish", "do the full edit", "edit it with everything", "make this a finished reel", asks for an edit that combines cuts, motion graphics, effects, transitions and sound, or asks for a named style preset such as "Nick style" or "edit like Nick Saraev". For a single effect only, use /effects instead.
 ---
 
 # Vaibhav Video Editor
@@ -41,13 +41,16 @@ Run `bash scripts/preflight.sh`. It prints one line per tool and component (`OK`
 
 **Load the style first.** If `~/.claude/skills/my-video-style/SKILL.md` exists, read it in full: it is the user's own taste and it wins over every default here. If it names a skill that isn't installed, use the nearest tool from this toolkit and say so once. If there is no saved style, use `references/house-style.md` and offer `/video-editor:style` at the end.
 
-**Who wins when rules disagree:** what the user says in this chat > `my-video-style` > the Brand Nat codes they picked > the engine skill's defaults > `references/house-style.md`.
+**Who wins when rules disagree:** what the user says in this chat > a style preset they picked for this video > `my-video-style` > the Brand Nat codes they picked > the engine skill's defaults > `references/house-style.md`. A preset sets the look; their saved style still decides anything the preset doesn't cover (spellings, handle, export settings).
+
+**Style presets** live in `references/styles/`. Read the whole file when the user names one:
+- `nick-saraev.md`: Nick Saraev's fast AI-tool list reels (split card, full face and full-screen stat layouts, glowing browser cards, blue keyword captions, pause-free pace, comment-keyword CTA). Triggers: "Nick style", "Nick Saraev style", "edit like Nick". Has a classic 2025 variant.
 
 Then ask only what you don't already know, in one short message:
 - Which video? (a path, or drag it in; several clips are joined in name order)
 - Where is it going and what shape? (default from the style: usually 9:16 for Reels, TikTok and Shorts)
 - In one line, what is it about, and what should the viewer do at the end?
-- Style: their saved style, Brand Nat codes (offer to open the guide: `brand-nat-styles/guide/index.html`), a vibe in words, or "you pick".
+- Style: their saved style, a style preset (`references/styles/`, for example Nick style), Brand Nat codes (offer to open the guide: `brand-nat-styles/guide/index.html`), a vibe in words, or "you pick".
 - Look: clean or cinematic. Music: a mood or none. Handle for an end card, if any.
 - Anything to feature (logo, screenshots, their own screen recording) and names that must be spelled exactly.
 
@@ -98,7 +101,7 @@ Plan the whole edit before rendering anything. Read `references/beat-map.md` (wh
    |---|---|---|---|---|---|---|
 
    "Built with" names the tool and the exact primitive, for example `effects: orbit`, `awa card: list`, `HF: logo tiles (Nat V1)`, `camera: punch 1.1`.
-5. **Style card under it** (max 6 lines): the Brand Nat codes in play with their names (even when the user didn't pick codes, name the closest ones so they can swap them), look (clean or cinematic), accent colour, captions, music (mood and track), end card, b-roll.
+5. **Style card under it** (max 6 lines): the style preset if one is used, the Brand Nat codes in play with their names (even when the user didn't pick codes, name the closest ones so they can swap them), look (clean or cinematic), accent colour, captions, music (mood and track), end card, b-roll.
 6. **Budget and pacing rules:**
    - 5 to 6 styles for the whole video. Same job, same treatment every time.
    - A new beat every 3 to 6 s (or the style's pace, for example 2 to 3 s). Never two big things at once: an effect, a card and a b-roll never overlap. Max 2 layers stacked.

@@ -84,6 +84,8 @@ Drag a video into Claude Code and type:
 
 It shows you a plan first and only renders after you say go. Then tell it changes in plain words: *"captions bigger"*, *"zoom when I say insane"*, *"the cut at 0:14 is too sudden"*.
 
+**Style presets.** Say *"edit this in Nick style"* for the look of Nick Saraev's AI-tool reels: glowing browser cards over a soft background, a numbered header, big stat callouts, 1 to 3 word captions with a blue keyword, pause-free pacing and a comment-keyword CTA. Presets live in `references/styles/`, and adding one is a single Markdown file.
+
 **Your own style.** If you've saved a style with `/video-editor:start` or `/video-editor:style` (it lives at `~/.claude/skills/my-video-style/`), Vaibhav Video Editor follows it on every edit. Say *"add that to my style"* any time. Without one, it uses a clean, professional house style.
 
 ## What's inside
@@ -98,7 +100,8 @@ vaibhav-video-editor/
 │   ├── beat-map.md               which visual fits which moment, and how every Brand Nat code is built
 │   ├── transitions-sound.md      transitions, sound-effect cues, music and loudness rules
 │   ├── house-style.md            the default style: canvas, safe zones, captions, pace
-│   └── quality-check.md          the checklist run on every render
+│   ├── quality-check.md          the checklist run on every render
+│   └── styles/nick-saraev.md     style preset: Nick Saraev's reel look (plus a classic variant)
 └── scripts/
     ├── preflight.sh              finds your tools and skills
     ├── check_words.py            catches transcript timing drift against the real speech gaps
