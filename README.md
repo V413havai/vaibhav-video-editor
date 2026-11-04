@@ -92,7 +92,7 @@ It shows you a plan first and only renders after you say go. Then tell it change
 | ElevenLabs | paid (free plan: credit line, non-commercial) | add `export ELEVENLABS_API_KEY=your-key` to `~/.zshrc` |
 | Google Gemini TTS | free key, free-tier limits | free key at aistudio.google.com/apikey, then `export GEMINI_API_KEY=your-key` |
 | HeyGen | free with sign-in | `npx hyperframes auth login` |
-| Kokoro | free, offline | one-time `pip install kokoro-onnx soundfile` (it asks first) |
+| Kokoro | free, offline | one-time setup in its own Python 3.12 environment (the skill does it, after asking) |
 
 Keys stay in your own environment: never paste them into the chat.
 

@@ -168,7 +168,7 @@ For explainers, tool round-ups, ads and faceless reels: no camera footage, an AI
 | `elevenlabs` | paid plans; the free plan needs a credit line and isn't for commercial use | most natural, voice cloning, reads Hindi and Hinglish (`eleven_multilingual_v2`) | `ELEVENLABS_API_KEY` | exact, from the API |
 | `gemini` (Google) | free key from Google AI Studio, with free-tier limits | very natural, directed delivery (`style`) | `GEMINI_API_KEY` | by transcription |
 | `heygen` | free with a HyperFrames sign-in | natural | `npx hyperframes auth login` | exact |
-| `kokoro` | free, offline, commercial use OK | good, clearly synthetic in places | one-time `pip install kokoro-onnx soundfile` and a ~340 MB model (ask first) | by transcription |
+| `kokoro` | free, offline, commercial use OK | good, clearly synthetic in places | one-time setup (ask first): `python3.12 -m venv ~/.local/share/hyperframes-venv && ~/.local/share/hyperframes-venv/bin/pip install kokoro-onnx soundfile` (`voiceover.py` uses that venv automatically; Python 3.15 isn't supported yet), then a ~340 MB model on first use | by transcription |
 
 - API keys live only in the user's environment (`export ELEVENLABS_API_KEY=...` in `~/.zshrc`, added by them). Never ask for a key in the chat, never write one into a file, and never fall back to another voice silently when a key is missing: say what's missing and stop.
 - `--list-voices` shows the voices for `elevenlabs` and `kokoro`. Let them pick by name; offer two or three that fit the video.

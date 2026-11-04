@@ -20,6 +20,11 @@ and prints VOICE=, WORDS=, DURATION=. Keys are read from the environment only an
 import argparse, base64, glob, json, os, re, shutil, subprocess, sys, urllib.error, urllib.request
 
 HF = os.environ.get('HYPERFRAMES_CLI', 'npx --yes hyperframes@0.8.226').split()
+# Kokoro runs in its own Python 3.12 venv when there is one (set up with:
+#   python3.12 -m venv ~/.local/share/hyperframes-venv && ~/.local/share/hyperframes-venv/bin/pip install kokoro-onnx soundfile)
+_VENV_PY = os.path.expanduser('~/.local/share/hyperframes-venv/bin/python')
+if not os.environ.get('HYPERFRAMES_PYTHON') and os.path.exists(_VENV_PY):
+    os.environ['HYPERFRAMES_PYTHON'] = _VENV_PY
 
 
 def media_use_dir():
@@ -137,7 +142,7 @@ def transcribe(path, lang):
         model = next((m for m in models if 'turbo' in m), models[0])
         wav = tmp + '.wav'
         subprocess.run(['ffmpeg', '-y', '-v', 'error', '-i', path, '-ar', '16000', '-ac', '1', wav], check=True)
-        subprocess.run(['whisper-cli', '-m', model, '-f', wav, '-l', (lang or 'auto')[:2], '-ml', '1', '-sow', '-ojf',
+        subprocess.run(['whisper-cli', '-m', model, '-f', wav, '-l', lang[:2] if lang else 'auto', '-ml', '1', '-sow', '-ojf',
                         '-of', tmp, '-np'], check=True, capture_output=True)
         d, words = json.load(open(tmp + '.json')), []
         for seg in d['transcription']:
@@ -158,6 +163,22 @@ def transcribe(path, lang):
     t = json.load(open(os.path.join(d, 'transcript.json')))
     t = t.get('words', t.get('segments', t)) if isinstance(t, dict) else t
     return [{'start': w['start'], 'end': w['end'], 'word': w.get('text', w.get('word', '')).strip()} for w in t]
+
+
+def snap_to_speech(path, words):
+    """Transcribed starts often sit a little early, inside the pause before a sentence. TTS audio is clean, so move
+    any word that starts inside a silence to where the speech starts (keeping the words in order)."""
+    err = subprocess.run(['ffmpeg', '-hide_banner', '-nostats', '-i', path, '-af',
+                          'highpass=f=200,lowpass=f=3500,silencedetect=n=-32dB:d=0.12', '-f', 'null', '-'],
+                         capture_output=True, text=True).stderr
+    gaps = list(zip([float(x) for x in re.findall(r'silence_start: ([\d.]+)', err)],
+                    [float(x) for x in re.findall(r'silence_end: ([\d.]+)', err)]))
+    for s, e in gaps:
+        inside = [w for w in words if s + 0.05 < w['start'] < e - 0.05]
+        for k, w in enumerate(inside):
+            w['start'] = round(e + k * 0.08, 3)
+            w['end'] = max(w['end'], w['start'] + 0.05)
+    return words
 
 
 def respell(words, text):
@@ -200,7 +221,7 @@ def main():
     path, words = {'elevenlabs': lambda: tts_elevenlabs(text, out, a), 'kokoro': lambda: tts_kokoro(text_file, out, a),
                    'heygen': lambda: tts_heygen(text_file, out, a), 'gemini': lambda: tts_gemini(text, out, a)}[provider]()
     if not words:
-        words = respell(transcribe(path, a.lang), text)
+        words = snap_to_speech(path, respell(transcribe(path, a.lang), text))
     words = [{'start': round(w['start'], 3), 'end': round(w['end'], 3), 'word': w['word']} for w in words if w['word'].strip()]
     wpath = out + '-words.json'
     json.dump(words, open(wpath, 'w'), indent=0)

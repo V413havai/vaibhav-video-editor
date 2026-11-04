@@ -34,7 +34,7 @@ Every component this skill can drive: what it's best at, where it lives, how the
 - **ElevenLabs:** `ELEVENLABS_API_KEY`; calls `/v1/text-to-speech/{voice}/with-timestamps` for exact timings. Default model `eleven_multilingual_v2` (Hindi and Hinglish). Free plan: credit line, non-commercial.
 - **Google Gemini TTS:** `GEMINI_API_KEY` (free from Google AI Studio); through the HyperFrames audio engine (`media-use/audio/scripts/audio.mjs`, provider `gemini`), timings by transcription.
 - **HeyGen:** free with `npx hyperframes auth login`; `media-use/audio/scripts/heygen-tts.mjs`, timings included.
-- **Kokoro-82M:** free and offline through `npx hyperframes tts`; needs `pip install kokoro-onnx soundfile` and a ~340 MB model once (ask first). Non-English voices also need `espeak-ng`.
+- **Kokoro-82M:** free and offline through `npx hyperframes tts`. One-time setup (ask first): a Python 3.12 venv at `~/.local/share/hyperframes-venv` with `kokoro-onnx soundfile` (`voiceover.py` points HyperFrames at it through `HYPERFRAMES_PYTHON`), then a ~340 MB model on first use. Non-English voices also need `espeak-ng`. Transcribed timings are snapped to the real speech starts. A 22 s read takes about 25 s on an M-series Mac.
 - **Missing key:** say which key and where it goes; never switch to another voice silently.
 
 ## Effects and styles
