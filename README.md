@@ -33,7 +33,7 @@ Made by Vaibhav ([@vaibhavv.ai](https://instagram.com/vaibhavv.ai)).
 | Video Editor plugin | Any length: silence cuts, captions, titles, zooms, overlays, shorts from long videos, your saved style | mavgpt.ai/resources/make-videos-using-claude |
 | HyperFrames | Designed motion graphics, kinetic type, logo animations, background removal | in Claude Code: `/plugin marketplace add heygen-com/hyperframes` then `/plugin install hyperframes@hyperframes` |
 | effects | 45 face-tracked effects (orbit, spotlight, checklist, glass graph...) | `git clone https://github.com/Vibha-Ramprakash/claude-video-effects ~/.claude/skills/effects` |
-| brand-nat-styles | Style codes (H10 C9 L4 X1...) and a visual style guide | from the Brand Nat Style Guide |
+| brand-nat-styles | The Brand Nat Style Guide: 105 video styles with short codes (H10 C9 L4 X1...). Pick styles in the visual guide, copy the prompt and paste it with your video | made by Brand Nat, free to use on your own videos: get it from Brand Nat, then put the folder in `~/.claude/skills/brand-nat-styles/`. Say "show me the styles" to open the guide |
 | multicam-shot | AI camera-pass prompts for Seedance 2.0 Fast | `git clone https://github.com/aipauloshimas/kinetic-multicam ~/.claude/skills/multicam-shot` |
 | remotion-best-practices | Remotion rules, if your style builds in Remotion | the Remotion skill |
 
@@ -116,7 +116,7 @@ vaibhav-video-editor/
 ## Credits
 
 Vaibhav Video Editor orchestrates other people's excellent work. Please keep these credits when you share it:
-effects engine by Vibha Ramprakash (@vibha.in.progress, MIT) · awa-video-reel by Awa K. Penn (MIT) · MultiCam shot by The Creator Stack / pauloshimas (MIT) · Brand Nat Style Guide · HyperFrames by HeyGen · Remotion · Video Editor plugin by mavgpt.ai · sound effects in awa-video-reel from Pixabay.
+effects engine by Vibha Ramprakash (@vibha.in.progress, MIT) · awa-video-reel by Awa K. Penn (MIT) · MultiCam shot by The Creator Stack / pauloshimas (MIT) · Brand Nat Style Guide by Brand Nat · HyperFrames by HeyGen · Remotion · Video Editor plugin by mavgpt.ai · sound effects in awa-video-reel from Pixabay.
 
 ## License
 
