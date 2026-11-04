@@ -9,11 +9,15 @@ cues.json:
 Times are seconds on the video's own timeline. The music loops if it's shorter than the video and ducks under the
 voice (sidechain). The voice gets a light 80 Hz high-pass. Video is copied, not re-encoded.
 With music, also writes <out>_nomusic.mp4 (voice + sound effects) for adding a trending sound inside the app.
-The default sfx dir is awa-video-reel's sfx/ folder.
+Named sounds are looked up in --sfx-dir, then awa-video-reel's sfx/, then HyperFrames' bundled library
+(21 sounds: whoosh, whoosh-short, whoosh-cinematic, pop, click, click-soft, typing, key-press, chime, ping, notification,
+sparkle, riser, impact-bass-1/2, glitch-1..3, error). A sound that isn't found is skipped with a warning.
 """
-import argparse, json, os, subprocess, sys
+import argparse, glob, json, os, subprocess, sys
 
-DEFAULT_SFX = os.path.join(os.path.expanduser('~'), '.claude', 'skills', 'awa-video-reel', 'sfx')
+# where named sounds are looked up, in order: --sfx-dir, awa-video-reel's library, HyperFrames' bundled library
+SFX_DIRS = [os.path.join(os.path.expanduser('~'), '.claude', 'skills', 'awa-video-reel', 'sfx')] + sorted(
+    glob.glob(os.path.expanduser('~/.claude/plugins/cache/hyperframes/hyperframes/*/skills/media-use/audio/assets/sfx')), reverse=True)
 FMT = 'aformat=sample_fmts=fltp:sample_rates=48000:channel_layouts=stereo'
 
 
@@ -23,19 +27,21 @@ def duration(path):
     return float(out.strip())
 
 
-def resolve(cue, sfx_dir):
+def resolve(cue, dirs):
+    """A cue's sound file: its `file`, or `name` looked up in each library (file name, then manifest key). None if missing."""
     if cue.get('file'):
-        return cue['file']
-    for ext in ('.mp3', '.wav', '.m4a', '.ogg'):
-        p = os.path.join(sfx_dir, cue['name'] + ext)
-        if os.path.isfile(p):
-            return p
-    man = os.path.join(sfx_dir, 'manifest.json')
-    if os.path.isfile(man):
-        m = json.load(open(man)).get(cue['name'])
-        if m:
-            return os.path.join(sfx_dir, m['file'])
-    sys.exit(f'sound not found: {cue.get("name")} in {sfx_dir}')
+        return cue['file'] if os.path.isfile(cue['file']) else None
+    for d in dirs:
+        for ext in ('.mp3', '.wav', '.m4a', '.ogg'):
+            p = os.path.join(d, cue['name'] + ext)
+            if os.path.isfile(p):
+                return p
+        man = os.path.join(d, 'manifest.json')
+        if os.path.isfile(man):
+            m = json.load(open(man)).get(cue['name'])
+            if m and os.path.isfile(os.path.join(d, m['file'])):
+                return os.path.join(d, m['file'])
+    return None
 
 
 def mix(video, cues, music, out, dur, lufs, highpass):
@@ -80,15 +86,25 @@ def mix(video, cues, music, out, dur, lufs, highpass):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('video'); ap.add_argument('cues'); ap.add_argument('out')
-    ap.add_argument('--sfx-dir', default=DEFAULT_SFX)
+    ap.add_argument('--sfx-dir', help='your own folder of sounds, searched first')
     ap.add_argument('--lufs', type=float, default=-14.0)
     ap.add_argument('--no-highpass', action='store_true')
     a = ap.parse_args()
 
     spec = json.load(open(a.cues))
     dur = duration(a.video)
-    cues = [(resolve(c, a.sfx_dir), float(c['t']), float(c.get('vol', 0.3)))
-            for c in spec.get('cues', []) if 0 <= float(c['t']) < dur]
+    dirs = ([a.sfx_dir] if a.sfx_dir else []) + [d for d in SFX_DIRS if os.path.isdir(d)]
+    cues, missing = [], []
+    for c in spec.get('cues', []):
+        if not 0 <= float(c['t']) < dur:
+            continue
+        path = resolve(c, dirs)
+        if path:
+            cues.append((path, float(c['t']), float(c.get('vol', 0.3))))
+        else:
+            missing.append(c.get('name') or c.get('file'))
+    if missing:
+        print(f'skipped {len(missing)} sounds not found in {dirs or "any library"}: {sorted(set(missing))}')
     music = spec.get('music') if spec.get('music') and not spec['music'].get('off') else None
     if music and not os.path.isfile(music['file']):
         sys.exit(f'music file not found: {music["file"]}')

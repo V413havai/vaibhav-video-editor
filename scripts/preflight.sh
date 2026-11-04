@@ -57,7 +57,15 @@ else opt effects "the 45 face-tracked effects"; fi
 
 SFX=""
 [ -d "$SK/awa-video-reel/sfx" ] && SFX="$SK/awa-video-reel/sfx"
-[ -n "$SFX" ] && ok sfx-library "$SFX" || opt sfx-library "no sound effects library found (pass --sfx-dir to sound_mix.py)"
+[ -z "$SFX" ] && [ -n "$HF" ] && [ -d "${HF%/}/skills/media-use/audio/assets/sfx" ] && SFX="${HF%/}/skills/media-use/audio/assets/sfx"
+[ -n "$SFX" ] && ok sfx-library "$SFX" || opt sfx-library "no sound effects library found (install HyperFrames, or pass --sfx-dir to sound_mix.py)"
+
+echo "== voices (voiceover mode)"
+KV="$HOME/.local/share/hyperframes-venv/bin/python"
+if [ -x "$KV" ] && "$KV" -c "import kokoro_onnx, soundfile" >/dev/null 2>&1; then ok kokoro "free offline voice, venv $HOME/.local/share/hyperframes-venv"
+else opt kokoro "free offline voice: one-time setup, see SKILL.md voiceover mode (ask first)"; fi
+[ -n "$ELEVENLABS_API_KEY" ] && ok elevenlabs "key is set" || opt elevenlabs "no ELEVENLABS_API_KEY in this environment"
+[ -n "$GEMINI_API_KEY$GOOGLE_API_KEY" ] && ok gemini "key is set" || opt gemini "no GEMINI_API_KEY in this environment"
 
 echo
 [ "$REQ_MISSING" = 0 ] && echo READY || echo NOT_READY

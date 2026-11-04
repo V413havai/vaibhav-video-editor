@@ -1,10 +1,24 @@
-# Vaibhav Video Editor
+# Vaibhav AI Video Editor
 
-**One command, raw clip to finished video.** Vaibhav Video Editor is a Claude Code skill that runs your video editing skills as one professional pipeline: it cuts silences and retakes, plans the edit from what you say, adds captions, motion graphics, face-tracked effects, transitions, camera moves, b-roll, sound effects and music, checks its own work, and exports the final MP4.
+**One command, raw clip to finished video.** Vaibhav AI Video Editor is a Claude Code skill that runs your video editing skills as one professional pipeline: it cuts silences and retakes, plans the edit from what you say, adds captions, motion graphics, face-tracked effects, transitions, camera moves, b-roll, sound effects and music, checks its own work, and exports the final MP4.
 
 It doesn't replace your other video skills. It directs them: each moment in your video goes to the tool that does it best, and everything follows one plan that you approve first.
 
 Made by Vaibhav ([@vaibhavv.ai](https://instagram.com/vaibhavv.ai)).
+
+## Make a video with an AI voiceover (quick start)
+
+No camera, no editing skills. You give it a script or a topic; it makes the voice, animates every word and adds the sound.
+
+1. **Install** Claude Code, then the two things this mode needs (Claude can do both for you, see Install below):
+   - this skill, and
+   - HyperFrames: in Claude Code type `/plugin marketplace add heygen-com/hyperframes`, then `/plugin install hyperframes@hyperframes`.
+   You also need ffmpeg and Python 3 (Claude checks and offers to install them).
+2. **Ask:**
+   > /vaibhav-video-editor make a 25 second animated reel with a voiceover from this script: …
+3. **Approve** the script and the storyboard it shows you. It renders, checks its own work, and gives you the MP4 (1080x1920, 60 fps), a no-music copy and the voice file.
+
+The free voice (Kokoro) runs on your computer; the first time, the skill asks before a one-time setup (about 500 MB). For more natural voices, add an ElevenLabs or Google Gemini key (see Voices below). The look and pace of the example video are a preset: say *"in kinetic promo style"*, and *"brisk"* (default, about 1.2x), *"normal"* or *"fast"* for the pace.
 
 ## What it does
 
@@ -32,13 +46,13 @@ Made by Vaibhav ([@vaibhavv.ai](https://instagram.com/vaibhavv.ai)).
 |---|---|---|
 | awa-video-reel | One-pass reel edits (up to 60 s): effects, captions, cards, website b-roll, music and sound effects | by Awa K. Penn (awa-newsletter.beehiiv.com) |
 | Video Editor plugin | Any length: silence cuts, captions, titles, zooms, overlays, shorts from long videos, your saved style | mavgpt.ai/resources/make-videos-using-claude |
-| HyperFrames | Designed motion graphics, kinetic type, logo animations, background removal | in Claude Code: `/plugin marketplace add heygen-com/hyperframes` then `/plugin install hyperframes@hyperframes` |
+| HyperFrames | Designed motion graphics, kinetic type, logo animations, background removal, voices and 21 sound effects. **Needed for voiceover videos** | in Claude Code: `/plugin marketplace add heygen-com/hyperframes` then `/plugin install hyperframes@hyperframes` |
 | effects | 45 face-tracked effects (orbit, spotlight, checklist, glass graph...) | `git clone https://github.com/Vibha-Ramprakash/claude-video-effects ~/.claude/skills/effects` |
 | brand-nat-styles | The Brand Nat Style Guide: 105 video styles with short codes (H10 C9 L4 X1...). Pick styles in the visual guide, copy the prompt and paste it with your video | made by Brand Nat, free to use on your own videos: get it from Brand Nat, then put the folder in `~/.claude/skills/brand-nat-styles/`. Say "show me the styles" to open the guide |
 | multicam-shot | AI camera-pass prompts for Seedance 2.0 Fast | `git clone https://github.com/aipauloshimas/kinetic-multicam ~/.claude/skills/multicam-shot` |
 | remotion-best-practices | Remotion rules, if your style builds in Remotion | the Remotion skill |
 
-Nothing installed yet? Vaibhav Video Editor tells you what's missing and what each piece is for, and asks before installing anything.
+Nothing installed yet? Vaibhav AI Video Editor tells you what's missing and what each piece is for, and asks before installing anything.
 
 ## Install
 
@@ -85,7 +99,7 @@ Drag a video into Claude Code and type:
 
 It shows you a plan first and only renders after you say go. Then tell it changes in plain words: *"captions bigger"*, *"zoom when I say insane"*, *"the cut at 0:14 is too sudden"*.
 
-**Animated videos with an AI voice.** No footage? Say *"make an animated video about my 5 favourite AI tools with a voiceover"*. It writes the script (you approve it), makes the voice, and animates every word in HyperFrames. Voices:
+**Voices.** No footage? Say *"make an animated video about my 5 favourite AI tools with a voiceover"*. It writes the script (you approve it), voices it line by line, and animates every word in HyperFrames. Voices:
 
 | Voice | Cost | Setup |
 |---|---|---|
@@ -96,9 +110,9 @@ It shows you a plan first and only renders after you say go. Then tell it change
 
 Keys stay in your own environment: never paste them into the chat.
 
-**Style presets.** Say *"edit this in Nick style"* for the look of Nick Saraev's AI-tool reels: glowing browser cards over a soft background, a numbered header, big stat callouts, 1 to 3 word captions with a blue keyword, pause-free pacing and a comment-keyword CTA. Presets live in `references/styles/`, and adding one is a single Markdown file.
+**Style presets.** Say *"in kinetic promo style"* for the clean, quick faceless look of the example reel (big kinetic type with a yellow key word, motion graphics that act out each line, zoom-through transitions, a comment CTA card; `examples/kinetic-promo/`). Say *"edit this in Nick style"* for the look of Nick Saraev's AI-tool reels: glowing browser cards over a soft background, a numbered header, big stat callouts, 1 to 3 word captions with a blue keyword, pause-free pacing and a comment-keyword CTA. Presets live in `references/styles/`, and adding one is a single Markdown file.
 
-**Your own style.** If you've saved a style with `/video-editor:start` or `/video-editor:style` (it lives at `~/.claude/skills/my-video-style/`), Vaibhav Video Editor follows it on every edit. Say *"add that to my style"* any time. Without one, it uses a clean, professional house style.
+**Your own style.** If you've saved a style with `/video-editor:start` or `/video-editor:style` (it lives at `~/.claude/skills/my-video-style/`), Vaibhav AI Video Editor follows it on every edit. Say *"add that to my style"* any time. Without one, it uses a clean, professional house style.
 
 ## What's inside
 
@@ -113,9 +127,13 @@ vaibhav-video-editor/
 │   ├── transitions-sound.md      transitions, sound-effect cues, music and loudness rules
 │   ├── house-style.md            the default style: canvas, safe zones, captions, pace
 │   ├── quality-check.md          the checklist run on every render
-│   └── styles/nick-saraev.md     style preset: Nick Saraev's reel look (plus a classic variant)
+│   └── styles/
+│       ├── kinetic-promo.md      style preset: the clean, quick voiceover reel look
+│       └── nick-saraev.md        style preset: Nick Saraev's reel look (plus a classic variant)
+├── examples/kinetic-promo/       a full voiceover reel: script, build and the commands to remake it
 └── scripts/
     ├── preflight.sh              finds your tools and skills
+    ├── voice_lines.py            voices a script line by line at a chosen pace, one track + word timings
     ├── voiceover.py              AI voice from a script (ElevenLabs, Gemini, HeyGen, Kokoro) + word timings
     ├── check_words.py            catches transcript timing drift against the real speech gaps
     ├── apply_keep.py             makes the clean cut (click-free joins, plus a time map)
@@ -131,8 +149,8 @@ vaibhav-video-editor/
 
 ## Credits
 
-Vaibhav Video Editor orchestrates other people's excellent work. Please keep these credits when you share it:
-effects engine by Vibha Ramprakash (@vibha.in.progress, MIT) · awa-video-reel by Awa K. Penn (MIT) · MultiCam shot by The Creator Stack / pauloshimas (MIT) · Brand Nat Style Guide by Brand Nat · HyperFrames by HeyGen · Remotion · Video Editor plugin by mavgpt.ai · sound effects in awa-video-reel from Pixabay.
+Vaibhav AI Video Editor orchestrates other people's excellent work. Please keep these credits when you share it:
+effects engine by Vibha Ramprakash (@vibha.in.progress, MIT) · awa-video-reel by Awa K. Penn (MIT) · MultiCam shot by The Creator Stack / pauloshimas (MIT) · Brand Nat Style Guide by Brand Nat · HyperFrames by HeyGen · Remotion · Video Editor plugin by mavgpt.ai · sound effects in awa-video-reel from Pixabay · Kokoro-82M (Apache 2.0).
 
 ## License
 

@@ -3,7 +3,7 @@ name: vaibhav-video-editor
 description: Full start-to-finish video editing that runs every installed video skill as one pipeline. Cuts silences and retakes, plans the edit from the transcript, then adds captions, motion graphics, face-tracked effects, transitions, camera moves, b-roll, sound effects and music, checks its own work and exports the final MP4. Routes each beat to the right tool (awa-video-reel, the 45-effect engine, Brand Nat codes, HyperFrames, Remotion, the Video Editor plugin, MultiCam shot) and follows the saved style (my-video-style). Also makes fully animated videos from a script with an AI voiceover (ElevenLabs, Google Gemini, HeyGen or free Kokoro). Use when someone types /vaibhav-video-editor, says "edit this video start to finish", "do the full edit", "make this a finished reel", "edit it in Nick style", "make an animated video with a voiceover", or asks for an edit combining cuts, motion graphics, effects, transitions and sound. For a single effect only, use /effects instead.
 ---
 
-# Vaibhav Video Editor
+# Vaibhav AI Video Editor
 
 You are the director and the editor. The user hands over raw footage and a goal; you deliver a finished, checked video. You decide which tool does each job, show one plan, wait for a yes, then do every technical step yourself.
 
@@ -44,6 +44,7 @@ Run `bash scripts/preflight.sh`. It prints one line per tool and component (`OK`
 **Who wins when rules disagree:** what the user says in this chat > a style preset they picked for this video > `my-video-style` > the Brand Nat codes they picked > the engine skill's defaults > `references/house-style.md`. A preset sets the look; their saved style still decides anything the preset doesn't cover (spellings, handle, export settings).
 
 **Style presets** live in `references/styles/`. Read the whole file when the user names one:
+- `kinetic-promo.md`: a clean, quick faceless reel from an AI voice: big kinetic type with a yellow key word, motion graphics that act out each line, zoom-through transitions, punch-ins, a drifting dot grid, a comment CTA card. The default look for voiceover mode when the user gives no other style. Worked example: `examples/kinetic-promo/`.
 - `nick-saraev.md`: Nick Saraev's fast AI-tool list reels (split card, full face and full-screen stat layouts, glowing browser cards, blue keyword captions, pause-free pace, comment-keyword CTA). Triggers: "Nick style", "Nick Saraev style", "edit like Nick". Has a classic 2025 variant.
 
 Then ask only what you don't already know, in one short message:
@@ -135,7 +136,7 @@ Make the first render a preview where the engine supports it (half size or `--pr
 ## Stage 7: Sound
 
 - **Engine A:** awa's mixer already places sound effects on every effect, card, list item, b-roll and camera move, ducks music about 10 dB under the voice, and mixes to -14 LUFS. Add extra cues with `"sfx"` in `edit.json` and scale with `"sound": {"level": ...}` (Nat S1 = 1.0, S2 = about 0.6 with only big moments).
-- **Engines B and C:** write `work/NAME-cues.json` from the plan (one cue per visual beat, rules in `references/transitions-sound.md`) and run `python3 scripts/sound_mix.py`. It places the sound effects, ducks music under the voice, high-passes at 80 Hz, mixes to -14 LUFS / -1 dBTP, and writes a no-music copy too.
+- **Engines B and C:** write `work/NAME-cues.json` from the plan (one cue per visual beat, rules in `references/transitions-sound.md`) and run `python3 scripts/sound_mix.py`. Named sounds come from awa-video-reel's library when installed, else HyperFrames' bundled 21 (the same names), so this works with HyperFrames alone; a missing sound is skipped with a warning. It places the sound effects, ducks music under the voice, high-passes at 80 Hz, mixes to -14 LUFS / -1 dBTP, and writes a no-music copy too.
 - Sound never fights the voice. Music only when the style or the user wants it. Never add copyrighted trending songs: the no-music copy is for adding those inside Instagram or TikTok.
 
 ## Stage 8: Quality check
@@ -161,7 +162,7 @@ For explainers, tool round-ups, ads and faceless reels: no camera footage, an AI
 
 **1. Script.** Take their script, or write one from their topic in their voice (a style preset's script shape, for example Nick style's "top 5 … right now / the first is … / comment KEYWORD"). Length: about 150 words a minute for a calm read, 200 to 220 for a fast reel. Short sentences, numbers written the way they should be read. Show the script and wait for an OK.
 
-**2. Voice.** Pick the provider with them (one line each), then run `python3 scripts/voiceover.py work/NAME-script.txt work --name NAME --provider <p> --voice <id>`:
+**2. Voice.** Pick the provider with them (one line each). For reels, voice it line by line: put one spoken line per row in `work/NAME-lines.txt` (every list item on its own row) and run `python3 scripts/voice_lines.py work/NAME-lines.txt work --name NAME --pace brisk --provider <p> --voice <id>`. It voices each line, lays them out with natural breaths, keeps every line on screen long enough to read, and writes one voice track with word timings. Paces: `normal`, `brisk` (default, about 1.2x and readable), `fast` (packed). `--min-hold "2:2.3"` gives a line with an animated card more time. For one continuous read (an explainer), use `python3 scripts/voiceover.py work/NAME-script.txt work --name NAME --provider <p> --voice <id>` instead. The providers:
 
 | Provider | Cost | Quality | Needs | Word timings |
 |---|---|---|---|---|
@@ -177,7 +178,7 @@ For explainers, tool round-ups, ads and faceless reels: no camera footage, an AI
 
 **3. Storyboard.** As stage 5, one row per sentence or beat, at the same pace rules. With no face on screen the visuals carry everything: kinetic type on key words, real logos and screenshots of every product named, UI recreations labelled as such, charts for numbers, icons, and optional AI b-roll (generated only after they approve the list and its credits). Read `/hyperframes` and its `references/types/explainer.md` (or `vertical.md` for reels) before planning.
 
-**4. Build (engine C).** Put the voice in the composition as an `<audio id="vo">` from 0, drive every entrance from the word times, and build captions from the same words. Lint, snapshot every beat, render. A style preset applies here too (Nick style without the face card: the split card becomes full-height cards).
+**4. Build (engine C).** Put the voice in the composition as an `<audio id="vo">` from 0, drive every entrance from the word times, and build captions from the same words (or, in kinetic-promo style, make the spoken words themselves the big on-screen type). Start from `examples/kinetic-promo/build.py` when the look fits: keep its helpers (word slams, labels, zoom-through, punch-ins, grid) and rewrite the scenes for the new script. Lint, snapshot every beat, render. A style preset applies here too (Nick style without the face card: the split card becomes full-height cards).
 
 **5. Sound and delivery.** As stages 7 to 9: `scripts/sound_mix.py` on the render (the voice is the video's audio, so music ducks under it) with a cue per visual beat, -14 LUFS. Deliver the video, the no-music copy, and the voice file on its own. Name the voice provider in the delivery note, and the credit line when the plan needs one (ElevenLabs free plan).
 
